@@ -1,74 +1,359 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mood Tracker</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <div class="container py-4">
-      <!-- Tooltip -->
-      <div id="tileTooltip" class="tooltip"></div>
-      
-      <header class="mb-4 text-center">
-        <h1 class="fw-bold">Муд‑трекер</h1>
-        <p class="text-muted mb-0">Отмечай настроение каждый день</p>
-      </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MoodTrack" />
+  <meta name="description" content="Отмечай настроение каждый день" />
+  <title>MoodTrack</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div id="app">
 
-      <section class="mb-4">
-        <div class="mood-buttons-container">
-          <button class="btn mood-btn" data-mood="1" style="--mood:#e3f2fd">😌 Очень спокойно</button>
-          <button class="btn mood-btn" data-mood="2" style="--mood:#c8e6c9">🙂 Нормально</button>
-          <button class="btn mood-btn" data-mood="3" style="--mood:#fff9c4">😐 Так себе</button>
-          <button class="btn mood-btn" data-mood="4" style="--mood:#ffe0b2">☹️ Плохо</button>
-          <button class="btn mood-btn" data-mood="5" style="--mood:#ffcdd2">😣 Очень плохо</button>
+  <!-- ── Auth Screen ──────────────────────────────────────────── -->
+  <div id="authScreen" class="screen">
+    <div class="auth-wrap">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎭</div>
+        <h1>MoodTrack</h1>
+        <p>Отмечай настроение каждый день</p>
+      </div>
+
+      <div class="auth-card">
+        <!-- Tab switcher -->
+        <div class="auth-tabs" id="authTabs">
+          <button class="auth-tab active" data-tab="login">Войти</button>
+          <button class="auth-tab" data-tab="register">Регистрация</button>
         </div>
-      </section>
 
-      <section>
-        <div class="year-controls-container">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="h5 mb-0" id="yearLabel"></div>
-            <div class="btn-group">
-              <button class="btn btn-outline-secondary btn-sm" id="prevYear">← Год</button>
-              <button class="btn btn-outline-secondary btn-sm" id="todayBtn">Сегодня</button>
-              <button class="btn btn-outline-secondary btn-sm" id="nextYear">Год →</button>
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" novalidate>
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" placeholder="you@example.com"
+                   autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Пароль</label>
+            <div class="pw-wrap">
+              <input id="loginPassword" type="password" placeholder="••••••••"
+                     autocomplete="current-password" required />
+              <button type="button" class="pw-toggle" aria-label="Показать пароль" tabindex="-1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
             </div>
           </div>
-        </div>
-        <div id="grid" class="mood-grid"></div>
-        <div class="year-controls-container">
-          <div class="small text-muted mt-2 text-center">Нажми на плитку дня, затем выбери настроение выше.</div>
-        </div>
-      </section>
-    </div>
+          <div id="loginError" class="form-error hidden"></div>
+          <button type="submit" class="btn-primary" id="loginSubmit">
+            <span class="btn-label">Войти</span>
+            <span class="btn-spin hidden"></span>
+          </button>
+        </form>
 
-    <!-- Error Modal -->
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-danger">
-          <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title" id="errorModalLabel">⚠️ Ошибка</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form hidden" novalidate>
+          <div class="field">
+            <label for="regUsername">Имя пользователя</label>
+            <input id="regUsername" type="text" placeholder="username"
+                   autocomplete="username" required minlength="2" maxlength="50" />
           </div>
-          <div class="modal-body">
-            <p class="mb-0">Нельзя ставить настроение на будущие даты. Выберите сегодняшний день или дату из прошлого.</p>
+          <div class="field">
+            <label for="regEmail">Email</label>
+            <input id="regEmail" type="email" placeholder="you@example.com"
+                   autocomplete="email" required />
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Понятно</button>
+          <div class="field">
+            <label for="regPassword">Пароль</label>
+            <div class="pw-wrap">
+              <input id="regPassword" type="password" placeholder="Минимум 8 символов"
+                     autocomplete="new-password" required minlength="8" />
+              <button type="button" class="pw-toggle" aria-label="Показать пароль" tabindex="-1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
           </div>
+          <div class="field">
+            <label for="regConfirm">Подтвердите пароль</label>
+            <div class="pw-wrap">
+              <input id="regConfirm" type="password" placeholder="••••••••"
+                     autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" aria-label="Показать пароль" tabindex="-1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div id="registerError" class="form-error hidden"></div>
+          <button type="submit" class="btn-primary" id="registerSubmit">
+            <span class="btn-label">Создать аккаунт</span>
+            <span class="btn-spin hidden"></span>
+          </button>
+        </form>
+
+        <!-- 2FA Verification Step (login) -->
+        <div id="totpLoginStep" class="auth-form hidden">
+          <div class="totp-header">
+            <div class="totp-icon-big">🔐</div>
+            <h3>Двухфакторная аутентификация</h3>
+            <p>Введите 6-значный код из приложения аутентификации</p>
+          </div>
+          <div class="field">
+            <input id="totpLoginCode" type="text" inputmode="numeric"
+                   placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+          </div>
+          <div id="totpLoginError" class="form-error hidden"></div>
+          <button type="button" class="btn-primary" id="totpVerifyBtn">Подтвердить</button>
+          <button type="button" class="btn-ghost" id="totpBackBtn">← Назад</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/script.js"></script>
-  </body>
-  </html>
+  <!-- ── Main App Screen ──────────────────────────────────────── -->
+  <div id="mainScreen" class="screen hidden">
 
+    <!-- Header -->
+    <header id="appHeader">
+      <div class="header-in">
+        <div class="header-brand">
+          <span class="brand-emoji">🎭</span>
+          <span class="brand-name">MoodTrack</span>
+        </div>
+        <button id="profileBtn" class="avatar-btn" aria-label="Профиль">
+          <span id="avatarInitial"></span>
+        </button>
+      </div>
+    </header>
 
+    <!-- Content -->
+    <main id="mainContent">
+
+      <!-- Tab: Year Grid -->
+      <div id="tabGrid" class="tab-panel active">
+        <div class="year-nav">
+          <button class="icon-btn" id="prevYear" aria-label="Предыдущий год">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span id="yearLabel" class="year-label"></span>
+          <button class="icon-btn" id="nextYear" aria-label="Следующий год">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div id="gridWrapper">
+          <div id="grid" class="mood-grid" role="grid" aria-label="Сетка настроений"></div>
+        </div>
+
+        <div class="mood-picker" id="moodPicker">
+          <div class="picker-label" id="pickerLabel">Выберите день на сетке</div>
+          <div class="picker-date" id="pickerDate"></div>
+          <div class="mood-btns">
+            <button class="mood-btn" data-mood="1" aria-label="Очень спокойно">
+              <span class="m-emoji">😌</span><span class="m-text">Спокойно</span>
+            </button>
+            <button class="mood-btn" data-mood="2" aria-label="Нормально">
+              <span class="m-emoji">🙂</span><span class="m-text">Нормально</span>
+            </button>
+            <button class="mood-btn" data-mood="3" aria-label="Так себе">
+              <span class="m-emoji">😐</span><span class="m-text">Так себе</span>
+            </button>
+            <button class="mood-btn" data-mood="4" aria-label="Плохо">
+              <span class="m-emoji">☹️</span><span class="m-text">Плохо</span>
+            </button>
+            <button class="mood-btn" data-mood="5" aria-label="Очень плохо">
+              <span class="m-emoji">😣</span><span class="m-text">Очень плохо</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Today -->
+      <div id="tabToday" class="tab-panel hidden">
+        <div class="today-card">
+          <h2>Как дела сегодня?</h2>
+          <p id="todayDate" class="today-date-label"></p>
+        </div>
+        <div class="today-list">
+          <button class="today-btn" data-mood="1">
+            <span class="today-emoji">😌</span>
+            <div class="today-btn-text">
+              <span class="today-btn-title">Очень спокойно</span>
+              <span class="today-btn-sub">Умиротворение, расслабленность</span>
+            </div>
+            <span class="today-check hidden">✓</span>
+          </button>
+          <button class="today-btn" data-mood="2">
+            <span class="today-emoji">🙂</span>
+            <div class="today-btn-text">
+              <span class="today-btn-title">Нормально</span>
+              <span class="today-btn-sub">Всё идёт по плану</span>
+            </div>
+            <span class="today-check hidden">✓</span>
+          </button>
+          <button class="today-btn" data-mood="3">
+            <span class="today-emoji">😐</span>
+            <div class="today-btn-text">
+              <span class="today-btn-title">Так себе</span>
+              <span class="today-btn-sub">Ни хорошо, ни плохо</span>
+            </div>
+            <span class="today-check hidden">✓</span>
+          </button>
+          <button class="today-btn" data-mood="4">
+            <span class="today-emoji">☹️</span>
+            <div class="today-btn-text">
+              <span class="today-btn-title">Плохо</span>
+              <span class="today-btn-sub">Тяжёлый день</span>
+            </div>
+            <span class="today-check hidden">✓</span>
+          </button>
+          <button class="today-btn" data-mood="5">
+            <span class="today-emoji">😣</span>
+            <div class="today-btn-text">
+              <span class="today-btn-title">Очень плохо</span>
+              <span class="today-btn-sub">Нужна поддержка</span>
+            </div>
+            <span class="today-check hidden">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab: Profile -->
+      <div id="tabProfile" class="tab-panel hidden">
+        <div class="profile-hero">
+          <div class="profile-av" id="profileAv"></div>
+          <h2 id="profileName"></h2>
+          <p id="profileEmail" class="muted-sm"></p>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-title">Безопасность</div>
+          <div class="settings-row">
+            <div class="settings-info">
+              <div class="settings-label">Двухфакторная аутентификация</div>
+              <div class="settings-desc" id="twoFADesc">Не настроена</div>
+            </div>
+            <button id="twoFABtn" class="btn-chip">Настроить</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-title">Аккаунт</div>
+          <button id="logoutBtn" class="settings-row settings-row--btn danger-row">
+            <div class="settings-info">
+              <div class="settings-label">Выйти из аккаунта</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav id="bottomNav" role="navigation">
+      <button class="nav-btn active" data-tab="grid">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+        <span>Год</span>
+      </button>
+      <button class="nav-btn" data-tab="today">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+        <span>Сегодня</span>
+      </button>
+      <button class="nav-btn" data-tab="profile">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Профиль</span>
+      </button>
+    </nav>
+
+  </div><!-- /mainScreen -->
+</div><!-- /app -->
+
+<!-- ── 2FA Setup Modal ──────────────────────────────────────── -->
+<div id="modal2FASetup" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="setup2FATitle">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 id="setup2FATitle">Настройка 2FA</h3>
+      <button class="icon-close" id="close2FASetup" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Отсканируйте QR-код в приложении аутентификации:</p>
+      <p class="muted-sm">Google Authenticator, Authy, Microsoft Authenticator и другие</p>
+      <div class="qr-box">
+        <img id="qrImg" alt="QR-код для 2FA" />
+      </div>
+      <details class="secret-toggle">
+        <summary>Показать секретный ключ</summary>
+        <code id="totpSecretDisplay"></code>
+      </details>
+      <p class="mt-1">Введите 6-значный код для подтверждения:</p>
+      <div class="field">
+        <input id="setup2FAToken" type="text" inputmode="numeric"
+               placeholder="000000" maxlength="6" autocomplete="one-time-code" />
+      </div>
+      <div id="setup2FAError" class="form-error hidden"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelSetup2FA">Отмена</button>
+        <button class="btn-primary" id="confirm2FABtn">Включить 2FA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Disable 2FA Modal ────────────────────────────────────── -->
+<div id="modal2FADisable" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="disable2FATitle">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 id="disable2FATitle">Отключить 2FA</h3>
+      <button class="icon-close" id="close2FADisable" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Введите код из приложения аутентификации чтобы отключить 2FA:</p>
+      <div class="field">
+        <input id="disable2FAToken" type="text" inputmode="numeric"
+               placeholder="000000" maxlength="6" />
+      </div>
+      <div id="disable2FAError" class="form-error hidden"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelDisable2FA">Отмена</button>
+        <button class="btn-danger" id="confirmDisable2FABtn">Отключить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────── -->
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<!-- ── Tile Tooltip ──────────────────────────────────────────── -->
+<div id="tileTooltip" class="tile-tooltip" role="tooltip" aria-hidden="true"></div>
+
+<script src="/script.js"></script>
+</body>
+</html>
