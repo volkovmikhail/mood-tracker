@@ -1,0 +1,35 @@
+{
+  "name": "MoodTrack — Трекер настроения",
+  "short_name": "MoodTrack",
+  "description": "Отмечай настроение каждый день",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Отметить сегодня",
+      "short_name": "Сегодня",
+      "description": "Отметить настроение на сегодня",
+      "url": "/?tab=today",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    }
+  ],
+  "categories": ["health", "lifestyle", "productivity"]
+}
